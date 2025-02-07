@@ -12,7 +12,7 @@ using System.Diagnostics;
 using System.Collections.Specialized;
 using System.Text;
 using System.Drawing.Imaging; // Necessário para salvar capturas de tela
-using OpenQA.Selenium;
+//using OpenQA.Selenium;
 
 
 
