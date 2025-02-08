@@ -12,9 +12,6 @@ using System.Diagnostics;
 using System.Collections.Specialized;
 using System.Text;
 using System.Drawing.Imaging; // Necessário para salvar capturas de tela
-//using OpenQA.Selenium;
-
-
 
 namespace CSharpSeleniumExtentReportNetCoreTemplate.Helpers
 {
@@ -51,13 +48,17 @@ namespace CSharpSeleniumExtentReportNetCoreTemplate.Helpers
         public static string GetScreenshot(string path, IWebDriver driver)
         {
             string testName = TestContext.CurrentContext.Test.MethodName;
-            string date = DateTime.Now.ToString().Replace("/", "_").Replace(":", "_").Replace(" ", "-");
+            string date = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
 
             Screenshot screenshot = ((ITakesScreenshot)driver).GetScreenshot();
-            string filePathAndName = $"{path}/{testName}_{date}.png";
-            screenshot.SaveAsFile("screenshot.png", ScreenshotImageFormat.Png);
+            string filePathAndName = Path.Combine(path, $"{testName}_{date}.png");
 
-
+            // Corrigido: Agora usando FileStream para salvar corretamente
+            using (FileStream file = new FileStream(filePathAndName, FileMode.Create))
+            {
+                file.Write(screenshot.AsByteArray, 0, screenshot.AsByteArray.Length);
+                file.Flush();
+            }
 
             return filePathAndName;
         }

@@ -1,51 +1,41 @@
 using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
-using SeleniumExtras.WaitHelpers;
-using System;
+using CSharpSeleniumExtentReportNetCoreTemplate.Bases;
 
 namespace CSharpSeleniumExtentReportNetCoreTemplate.Pages
 {
-    public class LoginPage
+    public class LoginPage : PageBase
     {
-        private IWebDriver driver;
-        private WebDriverWait wait;
-
-        // Mapeamento dos elementos
         private By usernameField = By.Id("user-name");
         private By passwordField = By.Id("password");
         private By loginButton = By.Id("login-button");
         private By errorMessage = By.ClassName("error-message-container");
+        private By profileIcon = By.ClassName("bm-burger-button");
 
-        public LoginPage(IWebDriver driver)
-        {
-            this.driver = driver;
-            this.wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10)); // Timeout de 10 segundos
-        }
+        public LoginPage(IWebDriver driver) : base(driver) { }
 
         public void PreencherUsuario(string usuario)
         {
-            wait.Until(ExpectedConditions.ElementIsVisible(usernameField)).SendKeys(usuario);
+            SendKeys(usernameField, usuario);
         }
 
         public void PreencherSenha(string senha)
         {
-            wait.Until(ExpectedConditions.ElementIsVisible(passwordField)).SendKeys(senha);
+            SendKeys(passwordField, senha);
         }
 
         public void ClicarLogin()
         {
-            wait.Until(ExpectedConditions.ElementToBeClickable(loginButton)).Click();
-        }
-
-        // Método adicional para compatibilidade com `LoginFlows.cs`
-        public void ClicarEmLogin()
-        {
-            ClicarLogin(); // Mantém compatibilidade sem alterar `LoginFlows.cs`
+            Click(loginButton);
         }
 
         public string ObterMensagemDeErro()
         {
-            return wait.Until(ExpectedConditions.ElementIsVisible(errorMessage)).Text;
+            return GetText(errorMessage);
+        }
+
+        public bool ValidarUsuarioLogado()
+        {
+            return ElementoExiste(profileIcon);
         }
     }
 }

@@ -1,31 +1,21 @@
-﻿using OpenQA.Selenium;
-using CSharpSeleniumExtentReportNetCoreTemplate.Pages;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CSharpSeleniumExtentReportNetCoreTemplate.Pages;
 
 namespace CSharpSeleniumExtentReportNetCoreTemplate.Flows
 {
     public class LoginFlows
     {
-        #region Page Object and Constructor
-        private IWebDriver driver;
         private LoginPage loginPage;
 
-        public LoginFlows(IWebDriver driver)
+        public LoginFlows(LoginPage loginPage)
         {
-            this.driver = driver;
-            loginPage = new LoginPage(driver);
+            this.loginPage = loginPage;
         }
-        #endregion
 
-        public void EfetuarLogin(string username, string password)
+        public void EfetuarLogin(string usuario, string senha)
         {
-            loginPage.PreencherUsuario(username);
-            loginPage.PreencherSenha(password);
-            loginPage.ClicarLogin(); // Corrigido: método correto da LoginPage
+            loginPage.PreencherUsuario(usuario);
+            loginPage.PreencherSenha(senha);
+            loginPage.ClicarLogin();
         }
     }
 }

@@ -1,48 +1,17 @@
-﻿using CSharpSeleniumExtentReportNetCoreTemplate.Bases;
-using OpenQA.Selenium;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OpenQA.Selenium;
+using CSharpSeleniumExtentReportNetCoreTemplate.Bases;
 
 namespace CSharpSeleniumExtentReportNetCoreTemplate.Pages
 {
     public class BugReportPage : PageBase
     {
-        #region Mapping
-        By categoryComboBox = By.Name("category_id");
-        By summaryField = By.Name("summary");
-        By descriptionField = By.Name("description");
-        By uploadFileField = By.Id("ufile[]");
-        By submitButton = By.XPath("//input[@type='submit']");
-        #endregion
+        private By dropdownSeverity = By.Id("severity");
 
-        #region Actions
-        public void SelecionarCategoria(string categoria)
-        {
-            ComboBoxSelectByVisibleText(categoryComboBox, categoria);
-        }
-        
-        public void PreencherResumo(string resumo)
-        {
-            SendKeys(summaryField, resumo);
-        }
+        public BugReportPage(IWebDriver driver) : base(driver) { }
 
-        public void PreencherDescricao(string descricao)
+        public void SelecionarSeveridade(string severidade)
         {
-            SendKeys(descriptionField, descricao);
+            ComboBoxSelectByVisibleText(dropdownSeverity, severidade);
         }
-
-        public void InserirAnexo(string caminhoArquivo)
-        {
-            SendKeysWithoutWaitVisible(uploadFileField, caminhoArquivo);
-        }
-
-        public void ClicarEmSubmitReport()
-        {
-            Click(submitButton);
-        }
-        #endregion
     }
 }

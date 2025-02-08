@@ -1,90 +1,41 @@
 ﻿using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.IO;
-using System.Text;
-//using WebDriverManager;
-//using WebDriverManager.DriverConfigs.Impl;
 
 namespace CSharpSeleniumExtentReportNetCoreTemplate.Helpers
 {
     public class DriverFactory
     {
-        public static IWebDriver INSTANCE { get; set; } = null;
+        private static IWebDriver INSTANCE;
 
         public static void CreateInstance()
         {
-            string browser = BuilderJson.ReturnParameterAppSettings("BROWSER");
-            string execution = BuilderJson.ReturnParameterAppSettings("EXECUTION");
-            bool headless = bool.Parse(BuilderJson.ReturnParameterAppSettings("HEADLESS"));
-
             if (INSTANCE == null)
             {
-                switch (browser)
-                {
-                    case "chrome":
-                        // Atualiza automaticamente o ChromeDriver
-                        new DriverManager().SetUpDriver(new ChromeConfig());
+                ChromeOptions options = new ChromeOptions();
+                options.AddArgument("--start-maximized");
 
-                        if (execution.Equals("local"))
-                        {
-                            INSTANCE = headless ? Browsers.GetLocalChromeHeadless() : Browsers.GetLocalChrome();
-                        }
+                // Definir o caminho do ChromeDriver
+                string driverPath = @"C:\Users\deboraSilva\source\repos\csharp-selenium-nunit-web-tests-main\CSharpSeleniumExtentReportNetCoreTemplate\drivers\";
 
-                        if (execution.Equals("remota"))
-                        {
-                            INSTANCE = headless ? Browsers.GetRemoteChromeHeadless() : Browsers.GetRemoteChrome();
-                        }
+                // Criar a instância do ChromeDriver
+                INSTANCE = new ChromeDriver(driverPath, options);
 
-                        break;
-
-                    case "ie":
-                        if (execution.Equals("local"))
-                        {
-                            INSTANCE = Browsers.GetLocalInternetExplorer();
-                        }
-
-                        if (execution.Equals("remota"))
-                        {
-                            INSTANCE = Browsers.GetRemoteInternetExplorer();
-                        }
-
-                        break;
-
-                    case "firefox":
-                        if (execution.Equals("local"))
-                        {
-                            INSTANCE = Browsers.GetLocalFirefox();
-                        }
-
-                        if (execution.Equals("remota"))
-                        {
-                            INSTANCE = Browsers.GetRemoteFirefox();
-                        }
-
-                        break;
-
-                    case "edge":
-                        if (execution.Equals("local"))
-                        {
-                            INSTANCE = Browsers.GetLocalEdge();
-                        }
-
-                        if (execution.Equals("remota"))
-                        {
-                            INSTANCE = Browsers.GetRemoteEdge();
-                        }
-
-                        break;
-
-                    default:
-                        throw new Exception("O browser informado não existe ou não é suportado pela automação");
-                }
+                // Adicionar espera implícita para cada ação do WebDriver
+                INSTANCE.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(3);
             }
         }
 
-        public static void QuitInstace()
+        public static IWebDriver GetDriver()
+        {
+            if (INSTANCE == null)
+            {
+                throw new NullReferenceException("O WebDriver não foi inicializado. Chame 'CreateInstance()' primeiro.");
+            }
+            return INSTANCE;
+        }
+
+        public static void QuitInstance()
         {
             if (INSTANCE != null)
             {

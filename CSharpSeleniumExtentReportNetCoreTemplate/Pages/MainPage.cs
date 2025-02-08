@@ -1,30 +1,23 @@
-﻿using CSharpSeleniumExtentReportNetCoreTemplate.Bases;
-using OpenQA.Selenium;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OpenQA.Selenium;
+using CSharpSeleniumExtentReportNetCoreTemplate.Bases;
 
 namespace CSharpSeleniumExtentReportNetCoreTemplate.Pages
 {
     public class MainPage : PageBase
     {
-        #region Mapping
-        By usernameLoginInfoTextArea = By.XPath("//td[@class='login-info-left']/span[@class='italic']");
-        By reportIssueLink = By.XPath("//a[@href='/bug_report_page.php']");
-        #endregion
+        public MainPage(IWebDriver driver) : base(driver) { } // ✅ Agora passa driver corretamente
 
-        #region Actions
-        public string RetornaUsernameDasInformacoesDeLogin()
+        private By welcomeMessage = By.Id("welcome");
+        private By logoutButton = By.Id("logout");
+
+        public string ObterMensagemDeBoasVindas()
         {
-            return GetText(usernameLoginInfoTextArea);
+            return GetText(welcomeMessage);
         }
 
-        public void ClicarEmReportIssue()
+        public void ClicarSair()
         {
-            Click(reportIssueLink);
+            Click(logoutButton);
         }
-        #endregion
     }
 }

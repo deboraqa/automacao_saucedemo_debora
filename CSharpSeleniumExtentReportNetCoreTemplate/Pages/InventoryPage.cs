@@ -1,26 +1,23 @@
 ﻿using OpenQA.Selenium;
+using CSharpSeleniumExtentReportNetCoreTemplate.Bases;
 
 namespace CSharpSeleniumExtentReportNetCoreTemplate.Pages
 {
-    public class InventoryPage
+    public class InventoryPage : PageBase
     {
-        private IWebDriver driver;
-        private By addToCartButton = By.ClassName("btn_inventory");
-        private By cartButton = By.Id("shopping_cart_container");
+        private By firstProductAddButton = By.CssSelector(".inventory_item button");
+        private By cartIcon = By.Id("shopping_cart_container");
 
-        public InventoryPage(IWebDriver driver)
-        {
-            this.driver = driver;
-        }
+        public InventoryPage(IWebDriver driver) : base(driver) { }
 
         public void AdicionarProdutoAoCarrinho()
         {
-            driver.FindElement(addToCartButton).Click();
+            Click(firstProductAddButton);
         }
 
         public void AbrirCarrinho()
         {
-            driver.FindElement(cartButton).Click();
+            Click(cartIcon);
         }
     }
 }

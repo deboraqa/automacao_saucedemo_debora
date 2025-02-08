@@ -1,25 +1,22 @@
 ﻿using OpenQA.Selenium;
+using CSharpSeleniumExtentReportNetCoreTemplate.Bases;
 
 namespace CSharpSeleniumExtentReportNetCoreTemplate.Pages
 {
-    public class CheckoutCompletePage
+    public class CheckoutCompletePage : PageBase
     {
-        private IWebDriver driver;
-        private By backHomeButton = By.ClassName("btn_primary");
+        private By mensagemConfirmacao = By.CssSelector(".complete-header");
 
-        public CheckoutCompletePage(IWebDriver driver)
-        {
-            this.driver = driver;
-        }
+        public CheckoutCompletePage(IWebDriver driver) : base(driver) { }
 
         public bool ValidarCompraConcluida()
         {
-            return driver.Url.Contains("checkout-complete.html");
+            return ElementoExiste(mensagemConfirmacao);
         }
 
-        public void ClicarBackHome()
+        public string ObterMensagemConfirmacao()
         {
-            driver.FindElement(backHomeButton).Click();
+            return GetText(mensagemConfirmacao);
         }
     }
 }

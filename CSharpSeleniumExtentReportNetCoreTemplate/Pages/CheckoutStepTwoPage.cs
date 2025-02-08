@@ -1,20 +1,17 @@
 ﻿using OpenQA.Selenium;
+using CSharpSeleniumExtentReportNetCoreTemplate.Bases;
 
 namespace CSharpSeleniumExtentReportNetCoreTemplate.Pages
 {
-    public class CheckoutStepTwoPage
+    public class CheckoutStepTwoPage : PageBase
     {
-        private IWebDriver driver;
-        private By finishButton = By.ClassName("btn_action");
+        private By finishButton = By.Id("finish");
 
-        public CheckoutStepTwoPage(IWebDriver driver)
-        {
-            this.driver = driver;
-        }
+        public CheckoutStepTwoPage(IWebDriver driver) : base(driver) { }
 
         public void ClicarFinalizar()
         {
-            driver.FindElement(finishButton).Click();
+            Click(finishButton);
         }
     }
 }
