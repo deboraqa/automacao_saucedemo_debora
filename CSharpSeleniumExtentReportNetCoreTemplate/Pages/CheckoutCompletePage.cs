@@ -1,22 +1,33 @@
-﻿using OpenQA.Selenium;
+﻿using System; // Adicionado para Exception
+using OpenQA.Selenium;
 using CSharpSeleniumExtentReportNetCoreTemplate.Bases;
 
 namespace CSharpSeleniumExtentReportNetCoreTemplate.Pages
 {
     public class CheckoutCompletePage : PageBase
     {
-        private By mensagemConfirmacao = By.CssSelector(".complete-header");
+        private By tituloPagina = By.ClassName("title");
+        private By mensagemConfirmacao = By.ClassName("complete-header");
 
         public CheckoutCompletePage(IWebDriver driver) : base(driver) { }
 
-        public bool ValidarCompraConcluida()
+        public string ObterTituloPagina()
         {
-            return ElementoExiste(mensagemConfirmacao);
+            return driver.FindElement(tituloPagina).Text;
         }
 
-        public string ObterMensagemConfirmacao()
+        public void ValidarTituloPagina()
         {
-            return GetText(mensagemConfirmacao);
+            string titulo = ObterTituloPagina();
+            if (titulo != "Checkout: Complete!")
+            {
+                throw new Exception($"Erro: Título da página Checkout Complete incorreto! Esperado: 'Checkout: Complete!', Obtido: '{titulo}'");
+            }
+        }
+
+        public string ObterMensagemDeConfirmacao()
+        {
+            return driver.FindElement(mensagemConfirmacao).Text;
         }
     }
 }

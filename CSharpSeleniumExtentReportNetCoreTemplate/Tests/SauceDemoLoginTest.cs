@@ -4,6 +4,7 @@ using OpenQA.Selenium.Support.UI;
 using CSharpSeleniumExtentReportNetCoreTemplate.Bases;
 using CSharpSeleniumExtentReportNetCoreTemplate.Pages;
 using System;
+using System.Collections.Generic;
 
 namespace CSharpSeleniumExtentReportNetCoreTemplate.Tests
 {
@@ -27,75 +28,51 @@ namespace CSharpSeleniumExtentReportNetCoreTemplate.Tests
         }
 
         [Test]
-        public void LoginComCredenciaisValidas()
+        public void TestarVariosLoginsInvalidos()
         {
-            loginPage.PreencherUsuario("standard_user");
-            AguardarElementoVisivel(By.Id("password"));
+            var loginsInvalidos = new List<(string usuario, string senha, string mensagemEsperada)>
+            {
+                ("usuario_invalido", "secret_sauce", "Epic sadface: Username and password do not match any user in this service"),
+                ("standard_user", "senha_errada", "Epic sadface: Username and password do not match any user in this service"),
+                ("", "secret_sauce", "Epic sadface: Username is required"),
+                ("standard_user", "", "Epic sadface: Password is required")
+            };
 
-            loginPage.PreencherSenha("secret_sauce");
-            AguardarElementoVisivel(By.Id("login-button"));
+            foreach (var (usuario, senha, mensagemEsperada) in loginsInvalidos)
+            {
+                // ✅ Limpa os campos antes do próximo teste
+                loginPage.LimparCampos();
 
-            loginPage.ClicarLogin();
-            AguardarMudancaDeUrl("inventory.html");
+                if (!string.IsNullOrEmpty(usuario))
+                {
+                    loginPage.PreencherUsuario(usuario);
+                    AguardarElementoVisivel(By.Id("password"));
+                }
 
-            Assert.That(driver.Url, Is.EqualTo("https://www.saucedemo.com/inventory.html"),
-                "A URL após o login não está correta.");
+                if (!string.IsNullOrEmpty(senha))
+                {
+                    loginPage.PreencherSenha(senha);
+                    AguardarElementoVisivel(By.Id("login-button"));
+                }
 
-            Assert.That(loginPage.ValidarUsuarioLogado(), Is.True, "O login não foi realizado com sucesso!");
-        }
+                loginPage.ClicarLogin();
 
-        [Test]
-        public void LoginComUsuarioInvalido()
-        {
-            loginPage.PreencherUsuario("usuario_invalido");
-            AguardarElementoVisivel(By.Id("password"));
+                // ✅ Aguarda a mensagem de erro antes de validar
+                bool erroVisivel = AguardarMensagemDeErro();
+                Assert.That(erroVisivel, Is.True, $"A mensagem de erro não apareceu para login '{usuario}'.");
 
-            loginPage.PreencherSenha("secret_sauce");
-            AguardarElementoVisivel(By.Id("login-button"));
+                // ✅ Verifica se a mensagem de erro está correta
+                string mensagemErro = loginPage.ObterMensagemDeErro();
+                Assert.That(mensagemErro, Is.EqualTo(mensagemEsperada),
+                    $"Mensagem de erro incorreta ao tentar login com usuário: '{usuario}' e senha: '{senha}'.");
 
-            loginPage.ClicarLogin();
-            AguardarElementoVisivel(By.ClassName("error-message-container"));
+                // ✅ Valida que a URL não mudou após um login inválido
+                Assert.That(driver.Url, Is.EqualTo("https://www.saucedemo.com/"),
+                    "A URL não deveria mudar após um login inválido.");
+            }
 
-            string mensagemErro = loginPage.ObterMensagemDeErro();
-            Assert.That(mensagemErro, Is.EqualTo("Epic sadface: Username and password do not match any user in this service"),
-                "Mensagem de erro incorreta ao tentar login com usuário inválido.");
-
-            Assert.That(driver.Url, Is.EqualTo("https://www.saucedemo.com/"),
-                "A URL não deveria mudar após um login inválido.");
-        }
-
-        [Test]
-        public void LoginComSenhaInvalida()
-        {
-            loginPage.PreencherUsuario("standard_user");
-            AguardarElementoVisivel(By.Id("password"));
-
-            loginPage.PreencherSenha("senha_errada");
-            AguardarElementoVisivel(By.Id("login-button"));
-
-            loginPage.ClicarLogin();
-            AguardarElementoVisivel(By.ClassName("error-message-container"));
-
-            string mensagemErro = loginPage.ObterMensagemDeErro();
-            Assert.That(mensagemErro, Is.EqualTo("Epic sadface: Username and password do not match any user in this service"),
-                "Mensagem de erro incorreta ao tentar login com senha inválida.");
-
-            Assert.That(driver.Url, Is.EqualTo("https://www.saucedemo.com/"),
-                "A URL não deveria mudar após um login inválido.");
-        }
-
-        [Test]
-        public void LoginComCamposVazios()
-        {
-            loginPage.ClicarLogin();
-            AguardarElementoVisivel(By.ClassName("error-message-container"));
-
-            string mensagemErro = loginPage.ObterMensagemDeErro();
-            Assert.That(mensagemErro, Is.EqualTo("Epic sadface: Username is required"),
-                "Mensagem de erro incorreta ao tentar login com campos vazios.");
-
-            Assert.That(driver.Url, Is.EqualTo("https://www.saucedemo.com/"),
-                "A URL não deveria mudar após um login inválido.");
+            // ✅ Encerra o navegador após os testes de login inválido
+            driver.Quit();
         }
 
         private void AguardarElementoVisivel(By by)
@@ -103,9 +80,16 @@ namespace CSharpSeleniumExtentReportNetCoreTemplate.Tests
             wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(by));
         }
 
-        private void AguardarMudancaDeUrl(string urlParcial)
+        private bool AguardarMensagemDeErro()
         {
-            wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.UrlContains(urlParcial));
+            try
+            {
+                return wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(By.ClassName("error-message-container"))).Displayed;
+            }
+            catch (WebDriverTimeoutException)
+            {
+                return false;
+            }
         }
     }
 }

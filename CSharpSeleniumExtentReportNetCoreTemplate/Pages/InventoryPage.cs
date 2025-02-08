@@ -5,19 +5,37 @@ namespace CSharpSeleniumExtentReportNetCoreTemplate.Pages
 {
     public class InventoryPage : PageBase
     {
-        private By firstProductAddButton = By.CssSelector(".inventory_item button");
-        private By cartIcon = By.Id("shopping_cart_container");
+        private By usernameField = By.Id("user-name");
+        private By passwordField = By.Id("password");
+        private By loginButton = By.Id("login-button");
+        private By carrinhoButton = By.ClassName("shopping_cart_link");
+        private By produtoAddCarrinho = By.ClassName("btn_inventory");
 
         public InventoryPage(IWebDriver driver) : base(driver) { }
 
-        public void AdicionarProdutoAoCarrinho()
+        public void PreencherUsuario(string usuario)
         {
-            Click(firstProductAddButton);
+            SendKeys(usernameField, usuario);
         }
 
-        public void AbrirCarrinho()
+        public void PreencherSenha(string senha)
         {
-            Click(cartIcon);
+            SendKeys(passwordField, senha);
+        }
+
+        public void ClicarLogin()
+        {
+            Click(loginButton);
+        }
+
+        public void ClicarCarrinho()
+        {
+            Click(carrinhoButton);
+        }
+
+        public void AdicionarProdutoAoCarrinho()
+        {
+            Click(produtoAddCarrinho);
         }
     }
 }

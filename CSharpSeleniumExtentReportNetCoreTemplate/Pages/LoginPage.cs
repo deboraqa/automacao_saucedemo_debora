@@ -37,5 +37,11 @@ namespace CSharpSeleniumExtentReportNetCoreTemplate.Pages
         {
             return ElementoExiste(profileIcon);
         }
+
+        public void LimparCampos()
+        {
+            driver.FindElement(usernameField).Clear();
+            driver.FindElement(passwordField).Clear();
+        }
     }
 }
