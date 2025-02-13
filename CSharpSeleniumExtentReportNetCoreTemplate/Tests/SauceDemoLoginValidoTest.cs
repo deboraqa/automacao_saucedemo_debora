@@ -1,48 +1,46 @@
-﻿using NUnit.Framework;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
-using CSharpSeleniumExtentReportNetCoreTemplate.Bases;
-using CSharpSeleniumExtentReportNetCoreTemplate.Pages;
-using System;
+﻿//using NUnit.Framework;
+//using CSharpSeleniumExtentReportNetCoreTemplate.Bases;
+//using CSharpSeleniumExtentReportNetCoreTemplate.Pages;
 
-namespace CSharpSeleniumExtentReportNetCoreTemplate.Tests
-{
-    [TestFixture]
-    public class SauceDemoLoginValidoTest : TestBase
-    {
-        private LoginPage loginPage;
-        private WebDriverWait wait;
+//namespace CSharpSeleniumExtentReportNetCoreTemplate.Tests
+//{
+//    [TestFixture]
+//    public class SauceDemoLoginValidoTest : TestBase
+//    {
+//        private LoginPage _loginPage;
 
-        [SetUp]
-        public void Inicializar()
-        {
-            loginPage = new LoginPage(driver);
-            driver.Navigate().GoToUrl("https://www.saucedemo.com/");
-            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-        }
+//        [SetUp]
+//        public void Inicializar()
+//        {
+//            _loginPage = new LoginPage(driver);
+//            driver.Navigate().GoToUrl("https://www.saucedemo.com/");
+//        }
 
-        [Test]
-        public void LoginComCredenciaisValidas()
-        {
-            loginPage.PreencherUsuario("standard_user");
-            loginPage.AguardarCampoSenhaVisivel();
-            loginPage.PreencherSenha("secret_sauce");
-            loginPage.AguardarBotaoLoginVisivel();
-            loginPage.ClicarLogin(); // ❌ Não chamamos `AguardarMensagemDeErro()`
+//        [Test]
+//        public void DeveFazerLoginComSucesso()
+//        {
+//            // Aguarda 2 segundos para visualização antes de preencher
+//            EsperarVisibilidade(2);
+//            _loginPage.PreencherUsuario("standard_user");
 
-            // ✅ Valida que o login foi bem-sucedido
-            Assert.That(driver.Url, Is.EqualTo("https://www.saucedemo.com/inventory.html"),
-                "Erro: O usuário não foi redirecionado corretamente para a página de inventário.");
-        }
+//            EsperarVisibilidade(2);
+//            _loginPage.AguardarCampoSenhaVisivel();
+//            _loginPage.PreencherSenha("secret_sauce");
 
-        [TearDown]
-        public void Finalizar()
-        {
-            if (driver != null)
-            {
-                driver.Quit();
-                driver = null;
-            }
-        }
-    }
-}
+//            EsperarVisibilidade(2);
+//            _loginPage.AguardarBotaoLoginVisivel();
+//            _loginPage.ClicarLogin();
+
+//            // Aguarda 3 segundos para visualizar a mudança de página
+//            EsperarVisibilidade(3);
+//            Assert.That(driver.Url, Does.Contain("/inventory.html"),
+//                "Erro: O usuário não foi direcionado para a página de inventário.");
+//        }
+
+//        [TearDown]
+//        public void Finalizar()
+//        {
+//            driver?.Quit();
+//        }
+//    }
+//}

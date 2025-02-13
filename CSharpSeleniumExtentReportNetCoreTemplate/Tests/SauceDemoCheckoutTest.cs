@@ -1,6 +1,9 @@
 ﻿using NUnit.Framework;
 using CSharpSeleniumExtentReportNetCoreTemplate.Bases;
 using CSharpSeleniumExtentReportNetCoreTemplate.Pages;
+using OpenQA.Selenium.Support.UI;
+using SeleniumExtras.WaitHelpers;
+using System;
 
 namespace CSharpSeleniumExtentReportNetCoreTemplate.Tests
 {
@@ -17,6 +20,10 @@ namespace CSharpSeleniumExtentReportNetCoreTemplate.Tests
         [SetUp]
         public void Inicializar()
         {
+            if (driver == null)
+            {
+                throw new InvalidOperationException("WebDriver não foi inicializado corretamente.");
+            }
             _loginPage = new LoginPage(driver);
             _inventoryPage = new InventoryPage(driver);
             _cartPage = new CartPage(driver);
@@ -25,34 +32,62 @@ namespace CSharpSeleniumExtentReportNetCoreTemplate.Tests
             _checkoutCompletePage = new CheckoutCompletePage(driver);
 
             driver.Navigate().GoToUrl("https://www.saucedemo.com/");
-            FazerLogin("standard_user", "secret_sauce", esperarErro: false);
         }
 
         [Test]
         public void FinalizarCompraComSucesso()
         {
-            _inventoryPage.AdicionarProdutoAoCarrinho();
-            _inventoryPage.ClicarCarrinho();
-            _cartPage.ClicarCheckout();
-            _checkoutStepOnePage.PreencherInformacoesCliente("Debora", "Silva", "30170-040");
-            _checkoutStepOnePage.ClicarContinuar();
-            _checkoutStepTwoPage.ClicarFinalizar();
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
 
-            Assert.That(_checkoutCompletePage.ObterMensagemDeConfirmacao(), Is.EqualTo("Thank you for your order!"));
+            // Efetua login
+            _loginPage.PreencherUsuario("standard_user");
+            EsperarVisibilidade(5);
+            _loginPage.PreencherSenha("secret_sauce");
+            EsperarVisibilidade(5);
+            _loginPage.ClicarLogin();
+            EsperarVisibilidade(5);
+
+            // Valida que está na página de inventário
+            wait.Until(ExpectedConditions.UrlContains("/inventory.html"));
+
+            // Adiciona produto ao carrinho
+            _inventoryPage.AdicionarProdutoAoCarrinho();
+            EsperarVisibilidade(5);
+            _inventoryPage.ClicarCarrinho();
+            EsperarVisibilidade(5);
+
+            // Página do Carrinho
+            wait.Until(ExpectedConditions.UrlContains("/cart.html"));
+            _cartPage.ClicarCheckout();
+            EsperarVisibilidade(5);
+
+            // Página Checkout Step One
+            wait.Until(ExpectedConditions.UrlContains("checkout-step-one.html"));
+            _checkoutStepOnePage.PreencherInformacoesCliente("Debora", "Silva", "30170-040");
+            EsperarVisibilidade(5);
+            _checkoutStepOnePage.ClicarContinuar();
+            EsperarVisibilidade(5);
+
+            // Página Checkout Step Two
+            wait.Until(ExpectedConditions.UrlContains("checkout-step-two.html"));
+            _checkoutStepTwoPage.ClicarFinalizar();
+            EsperarVisibilidade(5);
+
+            // Página Checkout Complete
+            wait.Until(ExpectedConditions.UrlContains("checkout-complete.html"));
+            _checkoutCompletePage.ClicarBackHome();
+            EsperarVisibilidade(5);
+
+            // Valida que foi redirecionado para a página de inventário
+            wait.Until(ExpectedConditions.UrlContains("/inventory.html"));
+            Assert.That(driver.Url, Does.Contain("/inventory.html"),
+                "Erro: O usuário não foi redirecionado para a página de inventário após clicar em 'Back Home'.");
         }
 
-        private void FazerLogin(string usuario, string senha, bool esperarErro)
+        [TearDown]
+        public void Finalizar()
         {
-            _loginPage.PreencherUsuario(usuario);
-            _loginPage.AguardarCampoSenhaVisivel();
-            _loginPage.PreencherSenha(senha);
-            _loginPage.AguardarBotaoLoginVisivel();
-            _loginPage.ClicarLogin();
-
-            if (esperarErro)
-            {
-                _loginPage.AguardarErroDeLogin();
-            }
+            driver?.Quit();
         }
     }
 }

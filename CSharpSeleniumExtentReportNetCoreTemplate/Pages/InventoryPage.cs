@@ -1,28 +1,56 @@
 ﻿using OpenQA.Selenium;
-using CSharpSeleniumExtentReportNetCoreTemplate.Bases;
+using OpenQA.Selenium.Support.UI;
+using System;
 
 namespace CSharpSeleniumExtentReportNetCoreTemplate.Pages
 {
-    public class InventoryPage : PageBase
+    public class InventoryPage
     {
-        private By carrinhoButton = By.ClassName("shopping_cart_link");
-        private By produtoAddCarrinho = By.ClassName("btn_inventory");
+        private readonly IWebDriver _driver;
 
-        public InventoryPage(IWebDriver driver) : base(driver) { }
+        private readonly By _menuButton = By.Id("react-burger-menu-btn");
+        private readonly By _logoutButton = By.Id("logout_sidebar_link");
+        private readonly By _addToCartButton = By.CssSelector(".btn_inventory");
+        private readonly By _cartButton = By.CssSelector(".shopping_cart_link");
 
-        public void ClicarCarrinho()
+        public InventoryPage(IWebDriver driver)
         {
-            Click(carrinhoButton);
+            _driver = driver;
+        }
+
+        public void AbrirMenu()
+        {
+            FluentWait().Until(d => d.FindElement(_menuButton)).Click();
+        }
+
+        public void ClicarLogout()
+        {
+            FluentWait().Until(d => d.FindElement(_logoutButton)).Click();
         }
 
         public void AdicionarProdutoAoCarrinho()
         {
-            Click(produtoAddCarrinho);
+            FluentWait().Until(d => d.FindElement(_addToCartButton)).Click();
         }
 
-        public bool CarrinhoVisivel()
+        public void ClicarCarrinho()
         {
-            return driver.FindElements(carrinhoButton).Count > 0; // ✅ Substituímos `ElementExists()` por uma verificação manual
+            FluentWait().Until(d => d.FindElement(_cartButton)).Click();
+        }
+
+        public bool EstaNaPaginaDeInventario()
+        {
+            return _driver.Url.Contains("/inventory.html");
+        }
+
+        private WebDriverWait FluentWait()
+        {
+            var wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(15))
+            {
+                PollingInterval = TimeSpan.FromMilliseconds(500)
+            };
+            wait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(ElementNotInteractableException));
+            return wait;
         }
     }
 }

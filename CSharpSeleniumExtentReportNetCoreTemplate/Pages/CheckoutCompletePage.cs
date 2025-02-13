@@ -1,23 +1,25 @@
 ﻿using OpenQA.Selenium;
-using CSharpSeleniumExtentReportNetCoreTemplate.Bases;
+using OpenQA.Selenium.Support.UI;
+using SeleniumExtras.WaitHelpers;
+using System;
 
 namespace CSharpSeleniumExtentReportNetCoreTemplate.Pages
 {
-    public class CheckoutCompletePage : PageBase
+    public class CheckoutCompletePage
     {
-        private By tituloPagina = By.ClassName("title");
-        private By mensagemConfirmacao = By.ClassName("complete-header");
+        private readonly IWebDriver _driver;
+        private readonly WebDriverWait _wait;
+        private readonly By _backHomeButton = By.CssSelector(".btn.btn_primary.btn_small");
 
-        public CheckoutCompletePage(IWebDriver driver) : base(driver) { }
-
-        public string ObterTituloPagina()
+        public CheckoutCompletePage(IWebDriver driver)
         {
-            return GetText(tituloPagina);
+            _driver = driver;
+            _wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
         }
 
-        public string ObterMensagemDeConfirmacao()
+        public void ClicarBackHome()
         {
-            return GetText(mensagemConfirmacao);
+            _wait.Until(ExpectedConditions.ElementToBeClickable(_backHomeButton)).Click();
         }
     }
 }

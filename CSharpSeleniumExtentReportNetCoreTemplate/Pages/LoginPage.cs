@@ -1,5 +1,6 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
+using SeleniumExtras.WaitHelpers;
 using System;
 
 namespace CSharpSeleniumExtentReportNetCoreTemplate.Pages
@@ -12,12 +13,13 @@ namespace CSharpSeleniumExtentReportNetCoreTemplate.Pages
         private readonly By _usernameField = By.Id("user-name");
         private readonly By _passwordField = By.Id("password");
         private readonly By _loginButton = By.Id("login-button");
-        private readonly By _errorMessageContainer = By.ClassName("error-message-container");
+        private readonly By _loginLogo = By.CssSelector(".login_logo");
 
+        // ? Construtor seguro
         public LoginPage(IWebDriver driver)
         {
-            _driver = driver;
-            _wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            _driver = driver ?? throw new ArgumentNullException(nameof(driver), "WebDriver não pode ser nulo.");
+            _wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(15));
         }
 
         public void PreencherUsuario(string usuario)
@@ -35,32 +37,6 @@ namespace CSharpSeleniumExtentReportNetCoreTemplate.Pages
             _driver.FindElement(_loginButton).Click();
         }
 
-        public string ObterMensagemDeErro()
-        {
-            try
-            {
-                _wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(_errorMessageContainer));
-                return _driver.FindElement(_errorMessageContainer).Text.Trim();
-            }
-            catch (NoSuchElementException)
-            {
-                return "Nenhuma mensagem de erro foi exibida.";
-            }
-        }
-
-        //  Novo Método: Verifica se a mensagem de erro foi exibida
-        public bool ErroDeLoginFoiExibido()
-        {
-            try
-            {
-                return _driver.FindElement(_errorMessageContainer).Displayed;
-            }
-            catch (NoSuchElementException)
-            {
-                return false;
-            }
-        }
-
         public void LimparCampos()
         {
             _driver.FindElement(_usernameField).Clear();
@@ -69,17 +45,28 @@ namespace CSharpSeleniumExtentReportNetCoreTemplate.Pages
 
         public void AguardarCampoSenhaVisivel()
         {
-            _wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(_passwordField));
+            _wait.Until(ExpectedConditions.ElementIsVisible(_passwordField));
         }
 
         public void AguardarBotaoLoginVisivel()
         {
-            _wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(_loginButton));
+            _wait.Until(ExpectedConditions.ElementToBeClickable(_loginButton));
         }
 
-        public void AguardarErroDeLogin()
+        public bool EstaNaPaginaDeLogin()
         {
-            _wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(_errorMessageContainer));
+            try
+            {
+                bool urlValida = _driver.Url.Equals("https://www.saucedemo.com/");
+                bool logoVisivel = _driver.FindElement(_loginLogo).Displayed;
+                bool tituloCorreto = _driver.FindElement(_loginLogo).Text.Trim() == "Swag Labs";
+
+                return urlValida || (logoVisivel && tituloCorreto);
+            }
+            catch (NoSuchElementException)
+            {
+                return false;
+            }
         }
     }
 }

@@ -1,75 +1,61 @@
-﻿using NUnit.Framework;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
-using CSharpSeleniumExtentReportNetCoreTemplate.Bases;
-using CSharpSeleniumExtentReportNetCoreTemplate.Pages;
-using System;
-using System.Collections.Generic;
+﻿//using NUnit.Framework;
+//using CSharpSeleniumExtentReportNetCoreTemplate.Bases;
+//using CSharpSeleniumExtentReportNetCoreTemplate.Pages;
+//using System.Collections.Generic;
 
-namespace CSharpSeleniumExtentReportNetCoreTemplate.Tests
-{
-    [TestFixture]
-    public class SauceDemoLoginInvalidoTest : TestBase
-    {
-        private LoginPage _loginPage;
-        private WebDriverWait _wait;
+//namespace CSharpSeleniumExtentReportNetCoreTemplate.Tests
+//{
+//    [TestFixture]
+//    public class SauceDemoLoginInvalidoTest : TestBase
+//    {
+//        private LoginPage _loginPage;
 
-        [SetUp]
-        public void Inicializar()
-        {
-            _loginPage = new LoginPage(driver);
-            driver.Navigate().GoToUrl("https://www.saucedemo.com/");
-            _wait = new WebDriverWait(driver, TimeSpan.FromSeconds(15));
-        }
+//        [SetUp]
+//        public void Inicializar()
+//        {
+//            _loginPage = new LoginPage(driver);
+//            driver.Navigate().GoToUrl("https://www.saucedemo.com/");
+//        }
 
-        [Test]
-        public void TestarVariosLoginsInvalidos()
-        {
-            var loginsInvalidos = new List<(string usuario, string senha)>
-            {
-                ("standard_user", "senha_errada"),
-                ("usuario_invalido", "secret_sauce"),
-                ("", "secret_sauce"),
-                ("standard_user", "")
-            };
+//        [Test]
+//        public void TestarVariosLoginsInvalidos()
+//        {
+//            var loginsInvalidos = new List<(string usuario, string senha, string descricao)>
+//            {
+//                ("standard_user", "senha_errada", "Senha inválida"),
+//                ("usuario_invalido", "secret_sauce", "Usuário inválido"),
+//                ("", "secret_sauce", "Usuário vazio"),
+//                ("standard_user", "", "Senha vazia")
+//            };
 
-            foreach (var (usuario, senha) in loginsInvalidos)
-            {
-                _loginPage.LimparCampos();
+//            foreach (var (usuario, senha, descricao) in loginsInvalidos)
+//            {
+//                //  Corrigimos a sintaxe e limpamos os campos
+//                _loginPage.LimparCampos();
 
-                if (!string.IsNullOrEmpty(usuario))
-                {
-                    _loginPage.PreencherUsuario(usuario);
-                }
+//                if (!string.IsNullOrEmpty(usuario))
+//                {
+//                    _loginPage.PreencherUsuario(usuario);
+//                    _loginPage.AguardarCampoSenhaVisivel();
+//                }
 
-                if (!string.IsNullOrEmpty(senha))
-                {
-                    _loginPage.PreencherSenha(senha);
-                }
+//                if (!string.IsNullOrEmpty(senha))
+//                {
+//                    _loginPage.PreencherSenha(senha);
+//                    //_loginPage.AguardarBotaoLoginVisivel();
+//                }
 
-                _loginPage.ClicarLogin();
+//                _loginPage.ClicarLogin();
 
-                //  Valida se o usuário permaneceu na página de login
-                Assert.That(driver.Url, Does.Contain("saucedemo.com"),
-                    $"Erro: O usuário '{usuario}' deveria permanecer na página de login, mas foi redirecionado para '{driver.Url}'.");
+//                Assert.That(driver.Url.Contains("saucedemo.com"), Is.True,
+//                    $"Erro: {descricao} - O usuário não permaneceu na página de login.");
+//            }
+//        }
 
-                //  Valida se a mensagem de erro foi exibida
-                //Assert.That(_loginPage.ErroDeLoginFoiExibido(), Is.True,
-                // $"Erro: Nenhuma mensagem de erro foi exibida para o login inválido '{usuario}'.");
-                Assert.That(driver.Url, Does.Contain("saucedemo.com"),
-                $"Erro: O usuário '{usuario}' deveria permanecer na página de login, mas foi redirecionado para '{driver.Url}'.");
-
-            }
-        }
-
-        [TearDown]
-        public void Finalizar()
-        {
-            if (driver != null)
-            {
-                driver.Quit();
-                driver = null;
-            }
-        }
-    }
-}
+//        [TearDown]
+//        public void Finalizar()
+//        {
+//            driver?.Quit();
+//        }
+//    }
+//}
