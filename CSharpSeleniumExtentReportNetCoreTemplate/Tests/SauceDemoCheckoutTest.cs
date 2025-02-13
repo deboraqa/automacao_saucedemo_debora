@@ -4,6 +4,7 @@ using CSharpSeleniumExtentReportNetCoreTemplate.Pages;
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
 using System;
+using OpenQA.Selenium;
 
 namespace CSharpSeleniumExtentReportNetCoreTemplate.Tests
 {
@@ -46,39 +47,38 @@ namespace CSharpSeleniumExtentReportNetCoreTemplate.Tests
             EsperarVisibilidade(5);
             _loginPage.ClicarLogin();
             EsperarVisibilidade(5);
-
-            // Valida que está na página de inventário
             wait.Until(ExpectedConditions.UrlContains("/inventory.html"));
 
-            // Adiciona produto ao carrinho
-            _inventoryPage.AdicionarProdutoAoCarrinho();
+            // Adiciona dois produtos ao carrinho
+            driver.FindElement(By.Id("add-to-cart-sauce-labs-backpack")).Click();
+            driver.FindElement(By.Id("add-to-cart-sauce-labs-bike-light")).Click();
             EsperarVisibilidade(5);
-            _inventoryPage.ClicarCarrinho();
-            EsperarVisibilidade(5);
+            Assert.That(driver.FindElement(By.ClassName("shopping_cart_badge")).Text, Is.EqualTo("2"),
+                "Erro: Os produtos não foram adicionados corretamente ao carrinho.");
 
-            // Página do Carrinho
+            // Acessa o carrinho
+            driver.FindElement(By.ClassName("shopping_cart_link")).Click();
             wait.Until(ExpectedConditions.UrlContains("/cart.html"));
             _cartPage.ClicarCheckout();
             EsperarVisibilidade(5);
 
-            // Página Checkout Step One
-            wait.Until(ExpectedConditions.UrlContains("checkout-step-one.html"));
+            // Checkout Step One
             _checkoutStepOnePage.PreencherInformacoesCliente("Debora", "Silva", "30170-040");
             EsperarVisibilidade(5);
             _checkoutStepOnePage.ClicarContinuar();
             EsperarVisibilidade(5);
 
-            // Página Checkout Step Two
+            // Checkout Step Two
             wait.Until(ExpectedConditions.UrlContains("checkout-step-two.html"));
             _checkoutStepTwoPage.ClicarFinalizar();
             EsperarVisibilidade(5);
 
-            // Página Checkout Complete
+            // Checkout Complete
             wait.Until(ExpectedConditions.UrlContains("checkout-complete.html"));
             _checkoutCompletePage.ClicarBackHome();
             EsperarVisibilidade(5);
 
-            // Valida que foi redirecionado para a página de inventário
+            // Valida redirecionamento para inventário
             wait.Until(ExpectedConditions.UrlContains("/inventory.html"));
             Assert.That(driver.Url, Does.Contain("/inventory.html"),
                 "Erro: O usuário não foi redirecionado para a página de inventário após clicar em 'Back Home'.");

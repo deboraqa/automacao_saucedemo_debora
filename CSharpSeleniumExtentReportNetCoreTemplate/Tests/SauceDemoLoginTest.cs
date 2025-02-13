@@ -6,6 +6,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
 using System;
+using OpenQA.Selenium.Chrome;
 
 namespace CSharpSeleniumExtentReportNetCoreTemplate.Tests
 {
@@ -40,35 +41,71 @@ namespace CSharpSeleniumExtentReportNetCoreTemplate.Tests
         }
 
         [Test]
+        public void DeveVerificarElementosPaginaDeInventario()
+        {
+            _loginPage.PreencherUsuario("standard_user");
+            _loginPage.PreencherSenha("secret_sauce");
+            _loginPage.ClicarLogin();
+
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            wait.Until(ExpectedConditions.UrlContains("/inventory.html"));
+
+            Assert.That(driver.Url, Does.Contain("/inventory.html"), "Erro: Página de inventário não carregada.");
+            IWebElement titulo = driver.FindElement(By.ClassName("app_logo"));
+            Assert.That(titulo.Text, Is.EqualTo("Swag Labs"), "Erro: O título da página não é 'Swag Labs'.");
+            Assert.That(driver.FindElement(By.Id("react-burger-menu-btn")).Displayed, "Erro: Menu lateral não está visível.");
+        }
+
+        [Test]
+        public void DeveVerificarPersistenciaDeSessao()
+        {
+            // Login inicial
+            _loginPage.PreencherUsuario("standard_user");
+            _loginPage.PreencherSenha("secret_sauce");
+            _loginPage.ClicarLogin();
+
+            var cookies = driver.Manage().Cookies.AllCookies;
+            driver.Dispose(); // Fecha o navegador de forma segura
+
+            // Reabre o navegador e restaura a sessão
+            driver = new ChromeDriver();
+            driver.Manage().Window.Maximize();
+            driver.Navigate().GoToUrl("https://www.saucedemo.com/");
+
+            foreach (var cookie in cookies)
+            {
+                driver.Manage().Cookies.AddCookie(cookie);
+            }
+
+            // Aguarda antes de verificar a URL
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            driver.Navigate().GoToUrl("https://www.saucedemo.com/inventory.html");
+            wait.Until(d => d.Url.Contains("/inventory.html"));
+
+            // Valida a persistência da sessão
+            Assert.That(driver.Url, Does.Contain("/inventory.html"), "Erro: Sessão não persistiu.");
+            Assert.That(driver.FindElement(By.ClassName("app_logo")).Text, Is.EqualTo("Swag Labs"), "Erro: O título não é 'Swag Labs'.");
+        }
+
+        [Test]
         public void TestarVariosLoginsInvalidos()
         {
-            // Teste de login inválido com diversos cenários
             var loginsInvalidos = new List<(string usuario, string senha, string descricao)>
-            {
-                ("standard_user", "senha_errada", "Senha inválida"),
-                ("usuario_invalido", "secret_sauce", "Usuário inválido"),
-                ("", "secret_sauce", "Usuário vazio"),
-                ("standard_user", "", "Senha vazia")
-            };
+    {
+        ("locked_out_user", "secret_sauce", "Usuário bloqueado"),
+        ("problem_user", "secret_sauce", "Usuário problemático"),
+        (" standard_user ", "secret_sauce", "Usuário com espaços extras"),
+        ("standard_user", " secret_sauce ", "Senha com espaços extras"),
+        ("admin' OR '1'='1", "senha123", "SQL Injection"),
+    };
 
             foreach (var (usuario, senha, descricao) in loginsInvalidos)
             {
                 _loginPage.LimparCampos();
-
-                if (!string.IsNullOrEmpty(usuario))
-                {
-                    _loginPage.PreencherUsuario(usuario);
-                    _loginPage.AguardarCampoSenhaVisivel();
-                }
-                if (!string.IsNullOrEmpty(senha))
-                {
-                    _loginPage.PreencherSenha(senha);
-                    _loginPage.AguardarBotaoLoginVisivel();
-                }
-
+                _loginPage.PreencherUsuario(usuario);
+                _loginPage.PreencherSenha(senha);
                 _loginPage.ClicarLogin();
 
-                // Valida que o usuário permaneceu na página de login (não foi redirecionado)
                 Assert.That(driver.Url.Contains("saucedemo.com"), Is.True,
                     $"Erro: {descricao} - O usuário não permaneceu na página de login.");
             }
