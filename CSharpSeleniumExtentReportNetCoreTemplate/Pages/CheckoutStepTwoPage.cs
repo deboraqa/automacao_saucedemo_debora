@@ -1,5 +1,4 @@
-﻿using System; // Adicionado para Exception
-using OpenQA.Selenium;
+﻿using OpenQA.Selenium;
 using CSharpSeleniumExtentReportNetCoreTemplate.Bases;
 
 namespace CSharpSeleniumExtentReportNetCoreTemplate.Pages
@@ -8,26 +7,24 @@ namespace CSharpSeleniumExtentReportNetCoreTemplate.Pages
     {
         private By tituloPagina = By.ClassName("title");
         private By finalizarButton = By.Id("finish");
+        private By totalPedido = By.ClassName("summary_total_label");
 
         public CheckoutStepTwoPage(IWebDriver driver) : base(driver) { }
 
         public string ObterTituloPagina()
         {
-            return driver.FindElement(tituloPagina).Text;
-        }
-
-        public void ValidarTituloPagina()
-        {
-            string titulo = ObterTituloPagina();
-            if (titulo != "Checkout: Overview")
-            {
-                throw new Exception($"Erro: Título da página Checkout Step Two incorreto! Esperado: 'Checkout: Overview', Obtido: '{titulo}'");
-            }
+            return GetText(tituloPagina);
         }
 
         public void ClicarFinalizar()
         {
-            driver.FindElement(finalizarButton).Click();
+            Click(finalizarButton);
+        }
+
+        public string ObterTotalPedido()
+        {
+            string totalTexto = GetText(totalPedido);
+            return totalTexto.Replace("Total: ", "").Trim(); // 🔧 Remove o prefixo "Total: "
         }
     }
 }

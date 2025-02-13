@@ -1,5 +1,4 @@
-﻿using System; // Adicionado para Exception
-using OpenQA.Selenium;
+﻿using OpenQA.Selenium;
 using CSharpSeleniumExtentReportNetCoreTemplate.Bases;
 
 namespace CSharpSeleniumExtentReportNetCoreTemplate.Pages
@@ -8,6 +7,7 @@ namespace CSharpSeleniumExtentReportNetCoreTemplate.Pages
     {
         private By checkoutButton = By.Id("checkout");
         private By tituloPagina = By.ClassName("title");
+        private By produtoNoCarrinho = By.ClassName("inventory_item_name");
 
         public CartPage(IWebDriver driver) : base(driver) { }
 
@@ -18,16 +18,12 @@ namespace CSharpSeleniumExtentReportNetCoreTemplate.Pages
 
         public string ObterTituloPagina()
         {
-            return driver.FindElement(tituloPagina).Text;
+            return GetText(tituloPagina);
         }
 
-        public void ValidarTituloPagina()
+        public bool VerificarProdutoNoCarrinho()
         {
-            string titulo = ObterTituloPagina();
-            if (titulo != "Your Cart")
-            {
-                throw new Exception($"Erro: Título da página do carrinho incorreto! Esperado: 'Your Cart', Obtido: '{titulo}'");
-            }
+            return driver.FindElements(produtoNoCarrinho).Count > 0;
         }
     }
 }

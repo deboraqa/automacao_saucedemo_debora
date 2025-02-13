@@ -1,18 +1,22 @@
-﻿using CSharpSeleniumExtentReportNetCoreTemplate.Pages;
+﻿using OpenQA.Selenium;
+using CSharpSeleniumExtentReportNetCoreTemplate.Pages;
 
 namespace CSharpSeleniumExtentReportNetCoreTemplate.Flows
 {
     public class LoginFlows
     {
-        private LoginPage loginPage;
+        private readonly IWebDriver driver;
+        private readonly LoginPage loginPage;
 
-        public LoginFlows(LoginPage loginPage)
+        public LoginFlows(IWebDriver driver)
         {
-            this.loginPage = loginPage;
+            this.driver = driver;
+            this.loginPage = new LoginPage(driver);
         }
 
-        public void EfetuarLogin(string usuario, string senha)
+        public void RealizarLogin(string usuario, string senha)
         {
+            loginPage.LimparCampos();
             loginPage.PreencherUsuario(usuario);
             loginPage.PreencherSenha(senha);
             loginPage.ClicarLogin();

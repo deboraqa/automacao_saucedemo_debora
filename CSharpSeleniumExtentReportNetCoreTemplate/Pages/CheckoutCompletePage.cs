@@ -1,5 +1,4 @@
-﻿using System; // Adicionado para Exception
-using OpenQA.Selenium;
+﻿using OpenQA.Selenium;
 using CSharpSeleniumExtentReportNetCoreTemplate.Bases;
 
 namespace CSharpSeleniumExtentReportNetCoreTemplate.Pages
@@ -13,21 +12,12 @@ namespace CSharpSeleniumExtentReportNetCoreTemplate.Pages
 
         public string ObterTituloPagina()
         {
-            return driver.FindElement(tituloPagina).Text;
-        }
-
-        public void ValidarTituloPagina()
-        {
-            string titulo = ObterTituloPagina();
-            if (titulo != "Checkout: Complete!")
-            {
-                throw new Exception($"Erro: Título da página Checkout Complete incorreto! Esperado: 'Checkout: Complete!', Obtido: '{titulo}'");
-            }
+            return GetText(tituloPagina);
         }
 
         public string ObterMensagemDeConfirmacao()
         {
-            return driver.FindElement(mensagemConfirmacao).Text;
+            return GetText(mensagemConfirmacao);
         }
     }
 }
