@@ -55,7 +55,10 @@ namespace CSharpSeleniumExtentReportNetCoreTemplate.Tests
 
                 //  Valida se a mensagem de erro foi exibida
                 //Assert.That(_loginPage.ErroDeLoginFoiExibido(), Is.True,
-                  // $"Erro: Nenhuma mensagem de erro foi exibida para o login inválido '{usuario}'.");
+                // $"Erro: Nenhuma mensagem de erro foi exibida para o login inválido '{usuario}'.");
+                Assert.That(driver.Url, Does.Contain("saucedemo.com"),
+                $"Erro: O usuário '{usuario}' deveria permanecer na página de login, mas foi redirecionado para '{driver.Url}'.");
+
             }
         }
 
